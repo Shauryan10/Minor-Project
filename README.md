@@ -4,6 +4,12 @@ A local, explainable Cyber Defense Harness that transforms multi-source security
 
 The system combines deterministic log normalization, contextual asset/user enrichment, deterministic threshold and correlation rule evaluation, formulaic weighted risk scoring, Explainable AI (XAI) rationale generation, and optional evidence-grounded Large Language Model (LLM) advisory reasoning governed by a deterministic validation layer ("The Judge").
 
+## Analyst dashboard
+
+The Next.js analyst dashboard lives in [`dashboard/`](dashboard/). See its
+[README](dashboard/README.md) for Node.js 20 setup, development, and production
+build instructions.
+
 ---
 
 ## High-Level Purpose
