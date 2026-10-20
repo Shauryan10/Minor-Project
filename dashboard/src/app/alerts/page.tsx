@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useMemo } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { FilterX, SearchX } from "lucide-react";
 import { ANALYSIS_ISSUE_STATES, type AlertView, REVIEW_STATE_LABEL, RISK_LEVELS, type ReviewState, sortByPriority } from "@/lib/model";
@@ -33,6 +33,8 @@ function AlertsView() {
   const severity = params.get("severity") ?? "all";
   const sort = params.get("sort") ?? "priority";
   const q = params.get("q") ?? "";
+  const [search, setSearch] = useState(q);
+  useEffect(() => setSearch(q), [q]);
 
   const set = (key: string, value: string | null) => {
     const next = new URLSearchParams(params.toString());
@@ -54,8 +56,11 @@ function AlertsView() {
               <Input
                 type="search"
                 placeholder="Search rule, alert ID, host, user, IP…"
-                defaultValue={q}
-                onChange={(e) => set("q", e.target.value)}
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  set("q", e.target.value);
+                }}
                 className="h-8 w-64 text-sm"
                 aria-label="Search alerts"
               />
