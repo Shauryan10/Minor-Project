@@ -95,6 +95,8 @@ export interface KnowledgeSnippet {
   content?: string;
   title?: string;
   source?: string;
+  score?: number | null;
+  technique_id?: string;
   [key: string]: unknown;
 }
 

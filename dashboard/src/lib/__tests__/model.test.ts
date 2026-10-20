@@ -49,6 +49,18 @@ describe("buildAlerts", () => {
       host: "web-prod-01",
     });
   });
+
+  it("passes knowledge retrieval scores through unchanged", () => {
+    const scoredResult = cloneResult();
+    const expectedScore = 0.876543;
+    scoredResult.final_assessments[0].security_assessment.retrieved_cti = [
+      { id: "scored-snippet", content: "Retrieved context", score: expectedScore },
+    ];
+
+    const [alert] = buildAlerts(scoredResult);
+
+    expect(alert.knowledge[0].score).toBe(expectedScore);
+  });
 });
 
 describe("reviewState", () => {

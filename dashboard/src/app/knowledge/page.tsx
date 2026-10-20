@@ -13,12 +13,15 @@ import { LevelBadge } from "@/components/badges";
 import { investigateHref } from "@/components/alert-table";
 
 function group(alerts: AlertView[]) {
-  const map = new Map<string, { snippet: KnowledgeSnippet; alerts: AlertView[] }>();
+  const map = new Map<string, { snippet: KnowledgeSnippet; alerts: AlertView[]; topScore?: number }>();
   for (const a of alerts) {
     for (const k of a.knowledge) {
       const key = String(k.id ?? k.title ?? k.content);
-      const entry = map.get(key) ?? { snippet: k, alerts: [] };
+      const entry = map.get(key) ?? { snippet: k, alerts: [], topScore: undefined };
       entry.alerts.push(a);
+      if (typeof k.score === "number") {
+        entry.topScore = entry.topScore === undefined ? k.score : Math.max(entry.topScore, k.score);
+      }
       map.set(key, entry);
     }
   }
@@ -44,14 +47,21 @@ function KnowledgeView() {
               </EmptyState>
             ) : (
               <div className="grid gap-3 lg:grid-cols-2">
-                {groups.map(({ snippet, alerts: refs }) => (
-                  <Card key={String(snippet.id ?? snippet.content)}>
+                {groups.map(({ snippet, alerts: refs, topScore }) => (
+                  <Card key={String(snippet.id ?? snippet.title ?? snippet.content)}>
                     <CardHeader className="pb-2">
                       <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                         {snippet.id && <span className="font-mono">{snippet.id}</span>}
                         {snippet.category && <span className="rounded bg-muted px-1.5 py-0.5">{snippet.category.replace(/_/g, " ")}</span>}
+                        {snippet.source && <span>{snippet.source}</span>}
+                        {snippet.technique_id && <span className="font-mono">{snippet.technique_id}</span>}
+                        {topScore !== undefined && (
+                          <span className="rounded bg-muted px-1.5 py-0.5">Top relevance {topScore.toFixed(2)}</span>
+                        )}
                       </div>
-                      <CardTitle className="text-sm font-normal leading-relaxed">{snippet.content ?? snippet.title ?? "—"}</CardTitle>
+                      {snippet.title && <CardTitle className="text-sm font-medium leading-relaxed">{snippet.title}</CardTitle>}
+                      {snippet.content && <p className="text-sm leading-relaxed">{snippet.content}</p>}
+                      {!snippet.title && !snippet.content && <CardTitle className="text-sm font-normal leading-relaxed">—</CardTitle>}
                     </CardHeader>
                     <CardContent>
                       <p className="mb-1.5 text-xs font-medium text-muted-foreground">Supports {refs.length} alert(s)</p>

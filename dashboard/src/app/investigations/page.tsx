@@ -282,7 +282,7 @@ function Investigation({ a }: { a: AlertView }) {
           icon={BookOpen}
           title="Cybersecurity knowledge"
           tag={<SourceTag kind="knowledge" />}
-          description="Curated knowledge retrieved for this alert's indicators and provided to the AI analysis as context."
+          description="Cybersecurity knowledge retrieved for this alert (semantic search and curated threat intelligence) and provided to the AI analysis as context."
         >
           {a.knowledge.length ? (
             <ul className="space-y-2">
@@ -292,11 +292,23 @@ function Investigation({ a }: { a: AlertView }) {
                     {k.id && <span className="font-mono">{k.id}</span>}
                     {k.category && <span className="rounded bg-muted px-1.5 py-0.5">{k.category.replace(/_/g, " ")}</span>}
                     {k.title && <span>{k.title}</span>}
+                    {k.source && <span>{k.source}</span>}
+                    {k.technique_id && <span className="font-mono">{k.technique_id}</span>}
+                    {typeof k.score === "number" && (
+                      <span
+                        className="rounded bg-muted px-1.5 py-0.5"
+                        title="Semantic similarity score from knowledge retrieval"
+                      >
+                        Relevance {k.score.toFixed(2)}
+                      </span>
+                    )}
                   </div>
                   <blockquote className="border-l-2 border-indigo-500/50 pl-3">{k.content ?? "—"}</blockquote>
                 </li>
               ))}
-              <li className="text-xs text-muted-foreground">Relevance scores are not produced by this retrieval step.</li>
+              {!a.knowledge.some((k) => typeof k.score === "number") && (
+                <li className="text-xs text-muted-foreground">No relevance scores were returned for these items.</li>
+              )}
             </ul>
           ) : (
             <EmptyState title="No supporting knowledge was retrieved for this assessment" icon={BookOpen}>
